@@ -137,8 +137,11 @@ function coerce(f, raw) {
   }
   if (f.type === "phone") return normalizePhone(String(raw));
   if (f.type === "number") {
-    if (typeof raw !== "number") throw new Error("must be a number");
-    return Number.isInteger(raw) ? raw : raw;
+    // An <input type="number"> gives us a *string*. Rejecting strings meant the field was
+    // impossible to fill in from the form at all — a bug that only a real browser showed.
+    const n = typeof raw === "number" ? raw : Number(String(raw).trim());
+    if (!Number.isFinite(n)) throw new Error("must be a number");
+    return n;
   }
   if (f.type === "checkbox") {
     if (typeof raw !== "boolean") throw new Error("must be true or false");
