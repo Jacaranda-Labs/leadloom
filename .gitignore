@@ -5,3 +5,6 @@ artifacts/
 .dev.vars
 *.log
 .DS_Store
+.local-secrets.json
+artifacts/site/
+site/*.jpg
