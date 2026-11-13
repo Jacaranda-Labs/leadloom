@@ -84,6 +84,11 @@ def main() -> int:
         page.fill("#f_email", "browser.check@example.com")
         page.fill("#f_phone", "+1 415 555 0142")
         page.select_option("#f_vertical", "Reverse mortgage")
+        # Fill every optional field too: a bug where "Amount" could never be filled in
+        # passed 19 checks because no check ever typed into it.
+        page.fill("#f_state", "Texas")
+        page.fill("#f_amount", "240000")
+        page.fill("#f_notes", "Called about a reverse mortgage.")
         options = page.locator("#f_vertical option").count()
         check("all eight client verticals are offered", options >= 9, f"{options} options")
 
