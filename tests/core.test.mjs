@@ -309,3 +309,12 @@ test("live transport is exercised against a stub fetch, and a 200-with-error is 
       globalThis.fetch = realFetch;
     }
   });
+
+test("a number field accepts the string an <input type=number> actually sends", () => {
+  const form = buildForm(DEFINITION);
+  const r = validateSubmission(form, { ...GOOD, loan_amount: "240000" });
+  assert.equal(r.errors.loan_amount, undefined);
+  assert.equal(r.cleaned.loan_amount, 240000);
+  const bad = validateSubmission(form, { ...GOOD, loan_amount: "two hundred" });
+  assert.match(bad.errors.loan_amount, /must be a number/);
+});
