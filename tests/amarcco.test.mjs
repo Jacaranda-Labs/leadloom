@@ -75,3 +75,18 @@ test("a full submission with all optional purposes declined reaches the client o
   assert.equal(by["lead-buyers"].status, "blocked");
   assert.equal(by["lead-buyers"].reason, "customer_data_sharing_not_enabled");
 });
+
+test("a required consent purpose is labelled Required, not Optional", async () => {
+  const { formPage } = await import("../src/pages.js");
+  const { publishNotice } = await import("../src/consent.js");
+  const store = memoryStore();
+  await registerForm(store, form);
+  const notice = await publishNotice(store, form);
+  const html = formPage({ form, notice, env: {}, transport: "dry-run" });
+  const contact = html.split('id="p_contact_consent"')[1].split("</div>")[0];
+  const ads = html.split('id="p_advertising_measurement"')[1].split("</div>")[0];
+  assert.match(contact, /Required · basis/);
+  assert.match(ads, /Optional · basis/);
+  assert.ok(!/Optional/.test(html.split('name="purpose" value="contact_consent"')[1]
+    .split("</div>")[0]), "a required consent must never be described as optional");
+});
