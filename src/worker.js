@@ -7,7 +7,7 @@ import { publishNotice, currentState, verifyConsentChain, withdrawAll, ConsentEr
   from "./consent.js";
 import { eraseSubject, IntakeError, purge, registerForm, submit, loadForm, CLICK_ID_FIELDS }
   from "./pipeline.js";
-import { formPage, errorPage } from "./pages.js";
+import { formPage, errorPage, adminPage } from "./pages.js";
 import { timingSafeEqual, sha256Hex, nowIso } from "./crypto.js";
 
 const json = (body, status = 200, headers = {}) => new Response(
@@ -181,7 +181,34 @@ async function adminRoute(route, request, env, store, key, url) {
   const rest = route.rest || "";
   const method = request.method;
 
-  if (rest === "health" || rest === "") {
+  if (rest === "" && method === "GET") {
+    // A browser gets the console; anything asking for JSON still gets JSON.
+    const wantsJson = (request.headers.get("accept") || "").includes("application/json");
+    const chain = await verifyConsentChain(store, key);
+    const status = {
+      store: store.engine, transport: transport(env),
+      form_id: env.LEADLOOM_FORM_ID || "amarcco-lead",
+      submissions: await store.countSubmissions(),
+      deliveries: await store.countDeliveries(),
+      consent_chain: chain,
+      connectors: {
+        webhook: Boolean(env.WEBHOOK_URL),
+        meta: Boolean(env.META_PIXEL_ID && env.META_ACCESS_TOKEN),
+        google: Boolean(env.GOOGLE_CUSTOMER_ID && env.GOOGLE_DEVELOPER_TOKEN),
+        crm: Boolean(env.CRM_WEBHOOK_URL),
+      },
+      lead_resale_enabled: env.ALLOW_LEAD_RESALE === "true",
+    };
+    if (wantsJson) return json(status);
+    return html(adminPage({
+      status,
+      deliveries: await store.deliveryCounts(),
+      submissions: await store.recentSubmissions(25),
+      now: nowIso(),
+    }));
+  }
+
+  if (rest === "health") {
     const chain = await verifyConsentChain(store, key);
     return json({
       store: store.engine, transport: transport(env),
