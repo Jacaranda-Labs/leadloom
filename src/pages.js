@@ -168,7 +168,7 @@ function purposeHtml(p) {
       <div>
         <label class="ptitle" for="p_${esc(p.key)}">${esc(p.label)}${p.required ? " *" : ""}</label>
         <p class="pdesc">${esc(p.description)}</p>
-        <p class="meta">Optional · basis: <b>consent</b></p>
+        <p class="meta">${p.required ? "Required" : "Optional"} · basis: <b>consent</b></p>
       </div>
     </div>
   </div>`;
