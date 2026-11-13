@@ -98,6 +98,12 @@ export function d1Store(db) {
     clearClicks: (id) => run(`UPDATE submissions SET click_ids_json='{}' WHERE submission_id=?`,
       [id]),
     countSubmissions: async () => (await first(`SELECT COUNT(*) AS n FROM submissions`)).n,
+    recentSubmissions: async (limit = 25) => (await all(
+      `SELECT submission_id, form_id, subject_id, created_at, retention_until, redacted_at
+         FROM submissions ORDER BY created_at DESC LIMIT ?`, [limit])),
+    deliveryCounts: async () => all(
+      `SELECT status, reason, COUNT(*) AS n FROM deliveries GROUP BY status, reason
+        ORDER BY n DESC`),
 
     getIdem: async (formId, key) => first(
       `SELECT submission_id FROM idempotency WHERE form_id=? AND key=?`, [formId, key]),
@@ -202,6 +208,19 @@ export function memoryStore() {
       if (s) s.click_ids_json = "{}";
     },
     countSubmissions: async () => t.submissions.length,
+    recentSubmissions: async (limit = 25) => t.submissions.slice()
+      .sort((a, b) => (a.created_at < b.created_at ? 1 : -1)).slice(0, limit)
+      .map((s) => ({ submission_id: s.submission_id, form_id: s.form_id,
+        subject_id: s.subject_id, created_at: s.created_at,
+        retention_until: s.retention_until, redacted_at: s.redacted_at || null })),
+    deliveryCounts: async () => {
+      const m = new Map();
+      for (const d of t.deliveries) {
+        const k = `${d.status}|${d.reason || ""}`;
+        m.set(k, (m.get(k) || 0) + 1);
+      }
+      return [...m].map(([k, n]) => ({ status: k.split("|")[0], reason: k.split("|")[1], n }));
+    },
     getIdem: async (formId, key) =>
       clone(t.idempotency.find((i) => i.form_id === formId && i.key === key) || null),
     putIdem: async (formId, key, id, at) => {
