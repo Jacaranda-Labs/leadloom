@@ -267,3 +267,24 @@ test("a live-transport deployment with no credentials still sends nothing", asyn
   assert.equal(meta.status, "skipped");
   assert.equal(meta.reason, "no_credential");
 });
+
+test("the operator console renders as HTML for a browser and JSON for a monitor", async () => {
+  const html = await worker.fetch(req("GET", "/admin",
+    undefined, { authorization: `Bearer ${TOKEN}` }), envFor(), {});
+  assert.equal(html.status, 200);
+  const body = await html.text();
+  assert.match(body, /Operator console/);
+  assert.match(body, /Consent chain/);
+  assert.match(body, /no personal data is shown here on purpose/i);
+  assert.ok(!body.includes("ada@example.com"), "the console must not expose lead PII");
+
+  const asJson = await worker.fetch(new Request("http://form.local/admin", {
+    headers: { authorization: `Bearer ${TOKEN}`, accept: "application/json" },
+  }), envFor(), {});
+  const j = await asJson.json();
+  assert.equal(typeof j.submissions, "number");
+  assert.equal(j.consent_chain.ok, true);
+
+  const anon = await worker.fetch(req("GET", "/admin"), envFor(), {});
+  assert.equal(anon.status, 401, "the console is not public");
+});
