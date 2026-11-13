@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lead capture &amp; consent — Amarcco | Coldcode SI Labs</title>
+<meta name="description" content="Your lead capture system is live. A working, provable consent system for Amarcco Leads & Marketing LLC, built by Coldcode SI Labs.">
+<meta name="robots" content="noindex">
+<meta property="og:title" content="Your lead form is live — Amarcco">
+<meta property="og:description" content="Consent you can prove, down to the wording each person agreed to.">
+<style>
+:root{
+  --ink:#12202b; --ink-2:#334656; --muted:#66788a; --line:#e2e8ee;
+  --bg:#ffffff; --bg-2:#f5f8f7; --green:#0b3d2c; --green-2:#0f5c41; --green-3:#1f8a63;
+  --gold:#c9a227; --good:#0b6b3a; --warn:#8a4b00; --bad:#a3170b;
+  --shadow:0 1px 2px rgba(16,32,43,.05),0 8px 30px -12px rgba(16,32,43,.18);
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:var(--green-2)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--green-3)}
+
+/* ---------- nav ---------- */
+header.nav{position:sticky;top:0;z-index:20;backdrop-filter:saturate(140%) blur(10px);
+  background:rgba(255,255,255,.86);border-bottom:1px solid var(--line)}
+header.nav .wrap{display:flex;align-items:center;gap:16px;height:62px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.2px}
+.brand .mark{width:26px;height:26px;border-radius:7px;background:var(--green);
+  display:grid;place-items:center;color:#fff;font-size:13px;font-weight:800}
+header.nav nav{margin-left:auto;display:flex;gap:22px;font-size:14px;align-items:center}
+header.nav nav a{color:var(--ink-2);text-decoration:none;font-weight:600}
+header.nav nav a:hover{color:var(--green-2)}
+@media (max-width:760px){
+  header.nav nav a:not(.cta){display:none}
+  header.nav .wrap{gap:10px;height:58px}
+  .brand{white-space:nowrap;font-size:15px}
+  header.nav nav{margin-left:auto;flex:0 0 auto}
+  header.nav nav .cta{padding:9px 14px;font-size:13px;white-space:nowrap}
+}
+@media (max-width:400px){
+  .brand .mark{width:22px;height:22px;font-size:11px}
+  .brand{font-size:13.5px}
+  header.nav nav .cta{padding:8px 11px;font-size:12px}
+}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;background:
+  radial-gradient(1200px 500px at 78% -10%,#124a36 0%,transparent 60%),
+  linear-gradient(160deg,#0b3d2c 0%,#0a3325 52%,#082a1f 100%);
+  color:#fff;padding:74px 0 84px}
+.hero:after{content:"";position:absolute;inset:auto 0 0 0;height:5px;
+  background:linear-gradient(90deg,var(--green-3),var(--gold))}
+.hero .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:start;
+  padding-top:6px}
+.hero h1{font-size:clamp(34px,4.6vw,58px);line-height:1.04;letter-spacing:-1.6px;margin:14px 0 18px;
+  font-weight:800}
+.hero h1 em{font-style:normal;color:#8fd0b3}
+.hero p.lede{font-size:clamp(16px,1.6vw,19px);color:#cfe6da;max-width:33em;margin:0 0 30px}
+.hero .actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:4px}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:13px 22px;border-radius:10px;
+  font-weight:700;font-size:15px;text-decoration:none;border:1px solid transparent;
+  transition:transform .15s ease,background .15s ease,box-shadow .15s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary{background:#fff;color:var(--green)}
+.btn.primary:hover{background:#f0f7f3;box-shadow:0 10px 24px -12px rgba(0,0,0,.5)}
+.btn.ghost{border-color:rgba(255,255,255,.28);color:#fff;background:rgba(255,255,255,.06)}
+.btn.ghost:hover{background:rgba(255,255,255,.13)}
+.btn.dark{background:var(--green);color:#fff}
+.btn.dark:hover{background:var(--green-2)}
+.btn .ico{width:17px;height:17px;flex:none}
+.hero .meta-row{display:flex;gap:10px 24px;flex-wrap:wrap;margin-top:30px;font-size:13px;
+  color:#a9cbbb;max-width:30em}
+.hero .meta-row b{color:#fff;font-weight:700}
+.frame{position:relative;border-radius:16px;overflow:hidden;background:#0a2b20;
+  box-shadow:0 30px 70px -30px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.09);
+  transform:perspective(1400px) rotateY(-4deg) rotateX(1.5deg)}
+.frame .bar{display:flex;gap:6px;align-items:center;padding:9px 12px;background:#0d3527;
+  border-bottom:1px solid rgba(255,255,255,.07)}
+.frame .dot{width:8px;height:8px;border-radius:50%;background:#2c6350}
+.frame .url{margin-left:8px;font-size:10.5px;color:#7fae99;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.frame img{display:block}
+@media (max-width:900px){.hero .grid{grid-template-columns:1fr;gap:36px}
+  .frame{transform:none}}
+
+/* ---------- status strip ---------- */
+.strip{background:var(--bg-2);border-bottom:1px solid var(--line);padding:26px 0}
+.strip .row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.strip .item{display:flex;gap:12px;align-items:flex-start}
+.strip .dot{width:9px;height:9px;border-radius:50%;margin-top:7px;flex:none}
+.dot.live{background:var(--good);box-shadow:0 0 0 4px rgba(11,107,58,.13)}
+.dot.warn{background:var(--warn);box-shadow:0 0 0 4px rgba(138,75,0,.12)}
+.dot.bad{background:var(--bad);box-shadow:0 0 0 4px rgba(163,23,11,.1)}
+.strip b{display:block;font-size:14px}
+.strip span.s{font-size:13px;color:var(--muted)}
+@media (max-width:760px){.strip .row{grid-template-columns:1fr}}
+
+/* ---------- sections ---------- */
+section{padding:76px 0}
+section.tight{padding:56px 0}
+h2{font-size:clamp(24px,3vw,34px);letter-spacing:-.9px;line-height:1.15;margin:10px 0 14px;
+  font-weight:800}
+p.sec-lede{font-size:17px;color:var(--ink-2);max-width:44em;margin:0 0 34px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;
+  box-shadow:var(--shadow)}
+.card .num{font-size:12px;font-weight:800;color:var(--green-3);letter-spacing:.1em}
+.card h3{font-size:17px;margin:10px 0 8px;letter-spacing:-.3px}
+.card p{margin:0;font-size:14.5px;color:var(--ink-2)}
+@media (max-width:860px){.cards{grid-template-columns:1fr}}
+
+/* ---------- urls ---------- */
+.urls{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#fff;
+  box-shadow:var(--shadow)}
+.url-row{display:grid;grid-template-columns:190px 1fr;gap:16px;padding:18px 22px;
+  border-bottom:1px solid var(--line);align-items:center}
+.url-row:last-child{border-bottom:0}
+.url-row .k{font-size:13px;font-weight:700;color:var(--ink)}
+.url-row .k span{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:2px}
+.url-row code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;
+  background:#f2f5f4;border:1px solid var(--line);border-radius:7px;padding:7px 10px;
+  display:inline-block;word-break:break-all;color:var(--green)}
+.url-row .badge{display:inline-block;margin-left:8px;font-size:11px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:999px;
+  border:1px solid;vertical-align:middle}
+.badge.open{color:var(--good);border-color:#b6ddc9;background:#eef8f2}
+.badge.token{color:var(--warn);border-color:#e8d5b3;background:#fdf7ee}
+@media (max-width:700px){.url-row{grid-template-columns:1fr;gap:8px}}
+
+/* ---------- honest split ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.panel{border-radius:var(--radius);padding:26px;border:1px solid var(--line);background:#fff;
+  box-shadow:var(--shadow)}
+.panel.now{border-top:4px solid var(--good)}
+.panel.later{border-top:4px solid var(--warn);background:#fffdfa}
+.panel h3{font-size:15px;margin:0 0 14px;text-transform:uppercase;letter-spacing:.08em}
+.panel ul{margin:0;padding:0;list-style:none}
+.panel li{position:relative;padding:9px 0 9px 26px;font-size:14.5px;color:var(--ink-2);
+  border-bottom:1px dashed #eef1f4}
+.panel li:last-child{border-bottom:0}
+.panel li:before{content:"";position:absolute;left:0;top:16px;width:13px;height:13px;
+  border-radius:50%;background:#eef8f2;border:1px solid #b6ddc9}
+.panel.later li:before{background:#fdf7ee;border-color:#e8d5b3}
+@media (max-width:760px){.split{grid-template-columns:1fr}}
+
+/* ---------- guide ---------- */
+.guide{background:
+  radial-gradient(800px 300px at 12% 0%,#0f5c41 0%,transparent 62%),
+  linear-gradient(155deg,#0b3d2c,#082a1f);color:#fff;border-radius:18px;
+  padding:44px;display:grid;grid-template-columns:1fr 300px;gap:44px;align-items:center}
+.guide h2{color:#fff;margin-top:6px}
+.guide p{color:#cfe6da;margin:0 0 22px;max-width:34em}
+.guide .eyebrow{color:#8fd0b3}
+.contents{list-style:none;margin:0;padding:0;font-size:13.5px;color:#bcd8cb;
+  columns:2;column-gap:26px}
+.contents li{padding:4px 0;break-inside:avoid}
+.contents b{color:#fff;font-weight:600}
+.mock{background:#08251b;border:1px solid rgba(255,255,255,.12);border-radius:10px;
+  padding:16px;box-shadow:0 26px 50px -26px rgba(0,0,0,.8)}
+.mock .p{height:6px;border-radius:3px;background:rgba(255,255,255,.16);margin-bottom:8px}
+.mock .p.t{width:62%;height:9px;background:rgba(255,255,255,.32)}
+.mock .p.s{width:40%}
+.mock .p.x{width:86%}
+.mock .foot{margin-top:14px;font-size:10px;color:#6f9c88;display:flex;
+  justify-content:space-between}
+@media (max-width:860px){.guide{grid-template-columns:1fr;padding:30px}
+  .contents{columns:1}.mock{display:none}}
+
+/* ---------- console preview ---------- */
+.shot{border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);
+  box-shadow:var(--shadow)}
+.shot img{width:100%}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
+@media (max-width:860px){.two-col{grid-template-columns:1fr;gap:26px}}
+
+/* ---------- footer ---------- */
+footer{background:#08241a;color:#a9cbbb;padding:52px 0 40px;font-size:14px}
+footer .grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:36px}
+footer h4{color:#fff;font-size:13px;text-transform:uppercase;letter-spacing:.1em;margin:0 0 12px}
+footer a{color:#cfe6da;text-decoration:none}
+footer a:hover{text-decoration:underline}
+footer .brand-line{color:#fff;font-weight:800;font-size:16px;margin-bottom:8px}
+footer .fineprint{grid-column:1/-1;border-top:1px solid rgba(255,255,255,.1);
+  margin-top:34px;padding-top:20px;font-size:12.5px;color:#7fae99;line-height:1.6}
+@media (max-width:760px){footer .grid{grid-template-columns:1fr;gap:26px}}
+
+.note{display:flex;gap:14px;background:#fdf7ee;border:1px solid #e8d5b3;border-left:3px solid var(--warn);
+  border-radius:10px;padding:18px 20px;font-size:14px;color:#6b3f0a;margin-top:28px}
+.note b{color:#4d2c05}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <div class="brand"><span class="mark">C</span> Coldcode SI Labs</div>
+    <nav>
+      <a href="#live">What is live</a>
+      <a href="#guide">The guide</a>
+      <a href="#status">Status</a>
+      <a class="cta btn dark" href="__FORM_URL__" target="_blank" rel="noopener">Open the form</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap grid">
+    <div>
+      <div class="eyebrow">Delivery handover · Amarcco Leads &amp; Marketing LLC</div>
+      <h1>Your lead form is live — and it can <em>prove consent</em>.</h1>
+      <p class="lede">A working intake system on your own verticals, where every lead carries a
+        record of exactly what that person agreed to, under exactly the wording they read.
+        Nothing is sent anywhere they did not permit.</p>
+      <div class="actions">
+        <a class="btn primary" href="__FORM_URL__" target="_blank" rel="noopener">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>
+          Open the live form
+        </a>
+        <a class="btn ghost" href="__GUIDE_URL__" download>
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          Download the guide — 18 pages, PDF
+        </a>
+      </div>
+      <div class="meta-row">
+        <div><b>8</b> verticals configured</div>
+        <div><b>51</b> automated tests</div>
+        <div><b>19</b> browser checks</div>
+        <div><b>Dry-run</b> no data transmitted</div>
+      </div>
+    </div>
+    <div class="frame">
+      <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="url">__FORM_HOST__</span></div>
+      <img src="__IMG_FORM__" alt="The live lead form for Amarcco" width="1000" height="890">
+    </div>
+  </div>
+</div>
+
+<div class="strip">
+  <div class="wrap row">
+    <div class="item"><span class="dot live"></span><div>
+      <b>Form is collecting</b><span class="s">Live over HTTPS, storing to a real database</span></div></div>
+    <div class="item"><span class="dot live"></span><div>
+      <b>Consent chain verified</b><span class="s">Every record's signature re-checked on load</span></div></div>
+    <div class="item"><span class="dot warn"></span><div>
+      <b>Delivery in dry-run</b><span class="s">No ad platform, CRM or buyer receives anything yet</span></div></div>
+  </div>
+</div>
+
+<section id="live">
+  <div class="wrap">
+    <div class="eyebrow">What was built</div>
+    <h2>Three things most lead forms cannot do</h2>
+    <p class="sec-lede">Anyone can put a checkbox on a page. That is not the hard part. The hard
+      part is answering, months later, under scrutiny: <i>show me that this person agreed to this
+      specific use, on this date, under this wording.</i></p>
+    <div class="cards">
+      <div class="card">
+        <div class="num">01</div>
+        <h3>Consent you can prove</h3>
+        <p>The exact privacy notice is hashed and versioned at the moment of submission. The
+          consent log is hash-chained and signed with a key the database does not hold, so a past
+          entry cannot be quietly edited — only visibly broken.</p>
+      </div>
+      <div class="card">
+        <div class="num">02</div>
+        <h3>Nothing sent without permission</h3>
+        <p>Each destination sits behind a purpose gate. If the visitor did not agree to
+          advertising measurement, the request to Meta is never even built. Refusal is honoured
+          immediately, including for the contact permission your calls depend on.</p>
+      </div>
+      <div class="card">
+        <div class="num">03</div>
+        <h3>A receipt for every lead</h3>
+        <p>The visitor is told what happened to their data, destination by destination, in plain
+          words. Non-delivery is written down too, with the purpose that blocked it — so
+          "we did not sell this lead" becomes something you can evidence.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <div><b>Why the contact consent is a separate, required box.</b> Consent for autodialled or
+      prerecorded calls and texts has to be a real affirmative act, given separately — it cannot
+      be folded into "we will provide the service". A form that lets it slide is the failure
+      pattern regulators cite, and the calls that follow are the ones that cost money. Ours
+      refuses the submission and points at the missing box.</div>
+    </div>
+  </div>
+</section>
+
+<section class="tight" style="background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="eyebrow">Where things are</div>
+    <h2 style="font-size:clamp(22px,2.5vw,28px)">The three addresses that matter</h2>
+    <div class="urls" style="margin-top:26px">
+      <div class="url-row">
+        <div class="k">Lead form <span>Give this to your ad traffic</span></div>
+        <div><code>__FORM_URL__</code><span class="badge open">live</span></div>
+      </div>
+      <div class="url-row">
+        <div class="k">Operator console <span>Look up leads, chain status</span></div>
+        <div><code>__CONSOLE_URL__</code><span class="badge token">token required</span></div>
+      </div>
+      <div class="url-row">
+        <div class="k">Health check <span>Point an uptime monitor here</span></div>
+        <div><code>__HEALTH_URL__</code><span class="badge open">public</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap two-col">
+    <div>
+      <div class="eyebrow">The operator console</div>
+      <h2>One page that answers "did it work, and can we prove it?"</h2>
+      <p class="sec-lede" style="margin-bottom:20px">Four tiles: what mode the system is in, how
+        many leads have arrived, whether the consent record still verifies, and whether any lead
+        is being sold on. Deliberately no personal data — a dashboard that shows lead PII becomes
+        a second copy of the data you have to protect.</p>
+      <a class="btn dark" href="__CONSOLE_URL__" target="_blank" rel="noopener">Open the console</a>
+    </div>
+    <div class="shot"><img src="__IMG_CONSOLE__" alt="The operator console" width="1000" height="860"></div>
+  </div>
+</section>
+
+<section id="status" style="background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="eyebrow">Straight answer</div>
+    <h2>What is live today, and what still needs you</h2>
+    <p class="sec-lede">We would rather hand you a short list of open items than a claim that
+      everything is finished. Both columns are true right now.</p>
+    <div class="split">
+      <div class="panel now">
+        <h3>Working now</h3>
+        <ul>
+          <li>Form collecting on your eight verticals, with your privacy and terms links</li>
+          <li>Consent recorded, versioned and cryptographically verifiable</li>
+          <li>Purpose gate blocking every destination the visitor did not permit</li>
+          <li>Retention enforced at 180 days; click ids at 30 days</li>
+          <li>Erasure and withdrawal honoured immediately</li>
+          <li>Lead resale switched off at platform level, not just unticked</li>
+        </ul>
+      </div>
+      <div class="panel later">
+        <h3>Waiting on credentials or decisions</h3>
+        <ul>
+          <li>Meta pixel + token, Google conversion action — no conversion has been sent yet</li>
+          <li>CRM webhook and field map — the CRM destination reports "no credential"</li>
+          <li>Your own domain: <code>forms.amarccollc.com</code> needs DNS access</li>
+          <li>Move the Worker and database into Amarcco's own Cloudflare account</li>
+          <li>Resale position and data-broker registration — a legal decision, not a config change</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="guide">
+  <div class="wrap">
+    <div class="guide">
+      <div>
+        <div class="eyebrow">The manual</div>
+        <h2>Eighteen pages, every screen photographed</h2>
+        <p>Written for the person who has to run this, not for an engineer. Daily tasks with the
+          exact commands, what each status code means, the compliance position in plain
+          language, and the go-live checklist with an owner against every item.</p>
+        <a class="btn primary" href="__GUIDE_URL__" download>
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          Download the guide (PDF)
+        </a>
+        <p style="margin-top:14px;font-size:12.5px;color:#9dc4b1">This is the
+          <b style="color:#fff">public edition</b>: the operator token has been removed because
+          this file sits at a public URL. The copy delivered to Amarcco privately contains it.</p>
+      </div>
+      <div>
+        <ul class="contents">
+          <li><b>1</b> What is live, and where</li>
+          <li><b>2</b> How a submission flows</li>
+          <li><b>3</b> What the visitor sees</li>
+          <li><b>4</b> The operator console</li>
+          <li><b>5</b> Operator manual</li>
+          <li><b>6</b> Status codes explained</li>
+          <li><b>7</b> Compliance position</li>
+          <li><b>8</b> Credentials &amp; custody</li>
+          <li><b>9</b> Go-live checklist</li>
+          <li><b>10</b> Support &amp; contacts</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap grid">
+    <div>
+      <div class="brand-line">Coldcode SI Labs</div>
+      <p style="margin:0 0 10px">Engineering for lead-generation and compliance-critical systems.
+        We built this because the usual lead form cannot survive the only question that matters
+        when a regulator, an ad platform or a buyer asks it.</p>
+      <a href="https://coldcode-estate.pages.dev">coldcode-estate.pages.dev</a>
+    </div>
+    <div>
+      <h4>Talk to us</h4>
+      <p style="margin:0 0 6px"><a href="tel:+263784600904">+263 78 460 0904</a></p>
+      <p style="margin:0 0 6px"><a href="tel:+263779674212">+263 77 967 4212</a></p>
+      <p style="margin:0"><a href="https://wa.me/263784600904">WhatsApp us</a></p>
+    </div>
+    <div>
+      <h4>For your engineers</h4>
+      <p style="margin:0 0 6px"><a href="__REPO_URL__" target="_blank" rel="noopener">Source code</a></p>
+      <p style="margin:0 0 6px"><a href="__HEALTH_URL__">System health</a></p>
+      <p style="margin:0"><a href="__GUIDE_URL__" download>Guide (PDF)</a></p>
+    </div>
+    <div class="fineprint">
+      Prepared for Amarcco Leads &amp; Marketing LLC. The form collects and stores enquiries but
+      transmits nothing to any third party while the deployment is in dry-run — the receipt shown
+      to each visitor states this. No personal data appears on this page. © Coldcode SI Labs.
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
