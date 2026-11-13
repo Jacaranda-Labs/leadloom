@@ -1,0 +1,23 @@
+# For when this moves into the client's own Cloudflare account, or a real CI pipeline.
+# Deployment in this session was done through the REST API because `npm install` does not
+# work in the build sandbox — see README "How this was deployed".
+name = "leadloom-amarcco"
+main = "src/worker.js"
+compatibility_date = "2025-01-01"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "leadloom-amarcco"
+database_id = "PLACEHOLDER_SET_AFTER_CREATE"
+
+[vars]
+LEADLOOM_FORM_ID = "amarcco-lead"
+LEADLOOM_TRANSPORT = "dry-run"
+DEFAULT_COUNTRY = "US"
+ALLOW_LEAD_RESALE = "false"
+
+# Secrets are NOT in this file. Set them with:
+#   npx wrangler secret put LEADLOOM_CONSENT_KEY
+#   npx wrangler secret put LEADLOOM_ADMIN_TOKEN
+# and never commit the values.

@@ -1,1 +1,7 @@
-# placeholder, replaced by the real .gitignore
+node_modules/
+.deploy-state.json
+artifacts/
+.wrangler/
+.dev.vars
+*.log
+.DS_Store

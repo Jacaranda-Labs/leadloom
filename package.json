@@ -1,0 +1,16 @@
+{
+  "name": "leadloom-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cloudflare-native lead intake with enforceable, provable consent (Workers + D1)",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "node --test tests/",
+    "seed": "node scripts/seed.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4"
+  }
+}
