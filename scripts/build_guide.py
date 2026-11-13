@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import base64
 import json
+import os
 import pathlib
 import sys
 
@@ -16,13 +17,24 @@ from playwright.sync_api import sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ART = ROOT / "artifacts" / "guide"
-OUT = ROOT / "artifacts" / "LeadLoom-Amarcco-Guide.pdf"
-
 FORM_URL = "https://leadloom-amarcco.coldcode-si-labs.workers.dev/"
 CONSOLE_URL = "https://leadloom-amarcco.coldcode-si-labs.workers.dev/admin"
 HEALTH_URL = "https://leadloom-amarcco.coldcode-si-labs.workers.dev/healthz"
 REPO_URL = "https://github.com/Jacaranda-Labs/leadloom"
-OPERATOR_TOKEN = "7fb364205a6a536d8d9f503d8f9b657c4df748e652e21a59"
+# Two variants are produced from this one source:
+#   • the full guide, handed to Amarcco privately, which prints the real operator token;
+#   • a public variant for the pages.dev download link, where the token is redacted.
+# A credential must not be reachable at a public URL, however awkward that makes the
+# "download the guide" button look.
+PUBLIC = os.environ.get("GUIDE_VARIANT", "full") == "public"
+OPERATOR_TOKEN = (
+    "REDACTED — supplied separately, see section 8.1 of the copy delivered to Amarcco"
+    if PUBLIC else
+    "7fb364205a6a536d8d9f503d8f9b657c4df748e652e21a59"
+)
+
+OUT = ROOT / "artifacts" / (
+    "LeadLoom-Amarcco-Guide-public.pdf" if PUBLIC else "LeadLoom-Amarcco-Guide.pdf")
 D1_ID = "91e29325-be56-4ec4-817c-fbdd9c26084a"
 BUILD_DATE = "12 November 2026"
 
@@ -170,6 +182,8 @@ figure.shot.center figcaption { text-align: left; }
 
 
 def cover() -> str:
+    cover_foot = ("Public edition — operator credential redacted" if PUBLIC
+                  else "Confidential — contains a live operator credential")
     return f"""
 <div class="cover">
   <div class="band"></div>
@@ -189,7 +203,7 @@ def cover() -> str:
   </div>
   <div class="foot">
     <span><b>coldcode-estate.pages.dev</b> &nbsp;·&nbsp; +263 78 460 0904 &nbsp;·&nbsp; +263 77 967 4212</span>
-    <span>Confidential — contains a live operator credential</span>
+    <span>{cover_foot}</span>
   </div>
 </div>"""
 
@@ -251,6 +265,18 @@ FLOW_SVG = """
 
 
 def page_contents() -> str:
+    cred_box_cls = "warn" if PUBLIC else "bad"
+    cred_title = ("This is the public edition of the guide" if PUBLIC
+                  else "This PDF contains a live operator credential")
+    cred_body = (
+        "The operator token has been removed from this copy, because this file is served at a "
+        "public URL. Section 8.1 explains what the token is for and how it is held; the value "
+        "itself is supplied to Amarcco directly."
+        if PUBLIC else
+        "Section 8.1 prints the operator token, as requested, so that whoever runs the system "
+        "can start immediately. Treat the file as confidential, do not forward it outside "
+        "Amarcco, and rotate the token once it has been handed over — the rotation steps are "
+        "on the same page.")
     rows = [
         ("1", "What is live, and where"),
         ("2", "How a submission flows through the system"),
@@ -294,11 +320,9 @@ def page_contents() -> str:
     worse than one that says so. Section 9 lists exactly what is needed to switch it on.</p>
   </div>
 
-  <div class="box bad">
-    <h4>This PDF contains a live operator credential</h4>
-    <p>Section 8.1 prints the operator token, as requested, so that whoever runs the system can
-    start immediately. Treat the file as confidential, do not forward it outside Amarcco, and
-    rotate the token once it has been handed over — the rotation steps are on the same page.</p>
+  <div class="box {cred_box_cls}">
+    <h4>{cred_title}</h4>
+    <p>{cred_body}</p>
   </div>
 </div>"""
 
@@ -723,6 +747,18 @@ def page_compliance() -> str:
 
 
 def page_credentials() -> str:
+    token_note_open = (
+        '<div class="box warn"><h4>Redacted copy</h4>'
+        '<p>This is the publicly downloadable edition of the guide, so the operator token has '
+        'been removed. The copy delivered directly to Amarcco prints the live token and should '
+        'be kept confidential — never publish it or email it outside the company.</p></div>'
+        if PUBLIC else
+        '<div class="box bad"><h4>Because this is printed in a PDF</h4>'
+        '<p>A document that gets emailed is a weak place to keep a live credential. Two '
+        'recommendations, in order: <b>(1)</b> rotate this token once it has been handed '
+        'over — the rotation command is below, it takes a minute; <b>(2)</b> deliver the '
+        'replacement through a password manager or Signal, not email. We would rather tell '
+        'you this than quietly hand you a liability.')
     return f"""
 <div class="page">
   <h2>8 &nbsp;Credentials and key custody</h2>
@@ -736,8 +772,7 @@ def page_credentials() -> str:
   <p class="small" style="margin-top:2mm">Operator token · <code>LEADLOOM_ADMIN_TOKEN</code> ·
   treat as a password. Anyone with this string can read lead records.</p>
 
-  <div class="box bad">
-    <h4>Because this is printed in a PDF</h4>
+  {token_note_open}
     <p>A document that gets emailed is a weak place to keep a live credential. Two
     recommendations, in order: <b>(1)</b> rotate this token once it has been handed over —
     the rotation command is below, it takes a minute; <b>(2)</b> deliver the replacement
