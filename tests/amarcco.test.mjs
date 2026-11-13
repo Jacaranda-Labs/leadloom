@@ -90,3 +90,14 @@ test("a required consent purpose is labelled Required, not Optional", async () =
   assert.ok(!/Optional/.test(html.split('name="purpose" value="contact_consent"')[1]
     .split("</div>")[0]), "a required consent must never be described as optional");
 });
+
+test("a missing required consent is pointed at, not just called invalid", async () => {
+  const { formPage } = await import("../src/pages.js");
+  const { publishNotice } = await import("../src/consent.js");
+  const store = memoryStore();
+  await registerForm(store, form);
+  const notice = await publishNotice(store, form);
+  const html = formPage({ form, notice, env: {}, transport: "dry-run" });
+  assert.match(html, /data-err="consent_contact_consent"/,
+    "the consent error needs somewhere on the page to appear");
+});
