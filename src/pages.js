@@ -70,6 +70,23 @@ footer.site{max-width:720px;margin:0 auto;padding:0 20px 40px;font-size:12.5px;
 color:var(--muted)}
 code{background:#eef0f4;padding:1px 5px;border-radius:4px;font-size:12.5px}
 .diag{font-size:12.5px;color:var(--muted);margin-top:14px}
+main.wide{max-width:1040px}
+h2{font-size:17px;margin:30px 0 10px;letter-spacing:-.1px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.stat{display:flex;flex-direction:column;gap:4px;padding:18px}
+.stat .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);
+font-weight:700}
+.stat .v{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.stat .v.good{color:var(--ok)}.stat .v.bad{color:var(--bad)}.stat .v.warnish{color:var(--warn)}
+.stat .sub{font-size:12.5px;color:var(--muted);line-height:1.45}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;
+color:var(--muted);padding:0 8px 8px 0;border-bottom:1px solid var(--line);font-weight:700}
+td{padding:9px 8px 9px 0;border-bottom:1px solid #f0f2f5;vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.muted{color:var(--muted)}
+code{font-size:12px}
 `;
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => (
@@ -169,6 +186,7 @@ function purposeHtml(p) {
         <label class="ptitle" for="p_${esc(p.key)}">${esc(p.label)}${p.required ? " *" : ""}</label>
         <p class="pdesc">${esc(p.description)}</p>
         <p class="meta">${p.required ? "Required" : "Optional"} · basis: <b>consent</b></p>
+        <p class="err" data-err="consent_${esc(p.key)}" hidden></p>
       </div>
     </div>
   </div>`;
@@ -234,8 +252,11 @@ const FORM_JS = String.raw`
     form.querySelectorAll(".field input, .field select, .field textarea").forEach(function (el) {
       if (!el.name) return;
       if (el.type === "checkbox") data[el.name] = el.checked;
-      else if (el.type === "multiselect") return;
-      else if (el.value !== "") data[el.name] = el.value;
+      else if (el.type === "number") {
+        // Send a number, not the DOM's string: the API is typed, and "240000" quietly
+        // failing validation is exactly the kind of bug that loses a lead.
+        if (el.value !== "") data[el.name] = Number(el.value);
+      } else if (el.value !== "") data[el.name] = el.value;
     });
     form.querySelectorAll('input[name="purpose"]').forEach(function (el) {
       purposes[el.value] = el.checked;
@@ -249,7 +270,12 @@ const FORM_JS = String.raw`
     });
     Object.keys(details || {}).forEach(function (k) {
       var p = form.querySelector('[data-err="' + k + '"]');
-      if (p) { p.hidden = false; p.textContent = details[k]; }
+      if (p) {
+        p.hidden = false;
+        p.textContent = /^consent_/.test(k)
+          ? "Please tick this box to continue."
+          : details[k];
+      }
     });
   }
 
@@ -293,7 +319,9 @@ const FORM_JS = String.raw`
         showErrors(res.body.details);
         var b = document.createElement("div");
         b.className = "banner";
-        b.textContent = res.body.error || "Something went wrong.";
+        b.textContent = Object.keys(res.body.details || {}).length
+          ? "Some details need attention — they are marked below."
+          : (res.body.error || "Something went wrong.");
         out.appendChild(b);
         return;
       }
@@ -334,5 +362,92 @@ export function errorPage(code, message) {
   return shell({
     title: `${code} — ${CLIENT.short}`,
     body: `<main><h1>${esc(code)}</h1><p class="lede">${esc(message)}</p></main>`,
+  });
+}
+
+/** The operator console. Same data as /admin/health, laid out for a person who has to
+ *  answer "did it work, and can we prove it?" without reading JSON. */
+export function adminPage({ status, deliveries, submissions, now }) {
+  const pill = (v) => `<span class="pill ${v === "sent" ? "sent" : v === "failed" ? "failed"
+    : v === "blocked" ? "blocked" : "not_sent"}">${esc(v)}</span>`;
+  const rows = deliveries.length ? deliveries.map((d) => `<tr>
+      <td>${pill(d.status)}</td>
+      <td><code>${esc(d.reason || "—")}</code></td>
+      <td class="num">${d.n}</td>
+    </tr>`).join("") : `<tr><td colspan="3" class="muted">No deliveries recorded yet.</td></tr>`;
+
+  const subs = submissions.length ? submissions.map((s) => `<tr>
+      <td><code>${esc(s.submission_id)}</code></td>
+      <td>${esc(s.created_at.replace("T", " ").replace("Z", " UTC"))}</td>
+      <td>${esc(String(s.retention_until || "—").slice(0, 10))}</td>
+      <td>${s.redacted_at ? "<b>redacted</b>" : "held"}</td>
+    </tr>`).join("") : `<tr><td colspan="4" class="muted">No submissions yet.</td></tr>`;
+
+  const chain = status.consent_chain;
+  return shell({
+    title: "Operator console — LeadLoom",
+    body: `<main class="wide">
+  <h1>Operator console</h1>
+  <p class="lede">Everything below is read live from the database at ${esc(now)}.
+  This page requires the operator token.</p>
+
+  <div class="grid">
+    <div class="card stat"><span class="k">Transport</span>
+      <span class="v ${status.transport === "live" ? "warnish" : ""}">${esc(status.transport)}</span>
+      ${status.transport === "dry-run"
+        ? `<span class="sub">Nothing leaves the system. Payloads are built and recorded.</span>`
+        : `<span class="sub">Live: requests are being transmitted.</span>`}</div>
+    <div class="card stat"><span class="k">Submissions</span>
+      <span class="v">${status.submissions}</span>
+      <span class="sub">${status.deliveries} delivery decisions recorded</span></div>
+    <div class="card stat"><span class="k">Consent chain</span>
+      <span class="v ${chain.ok ? "good" : "bad"}">${chain.ok ? "verified" : "BROKEN"}</span>
+      <span class="sub">${chain.events} events${chain.ok ? ", every MAC and link checked"
+        : ", " + chain.problems.length + " problems"}</span></div>
+    <div class="card stat"><span class="k">Lead resale</span>
+      <span class="v ${status.lead_resale_enabled ? "warnish" : "good"}">
+        ${status.lead_resale_enabled ? "enabled" : "disabled"}</span>
+      <span class="sub">${status.lead_resale_enabled
+        ? "Consented leads may be shared with buyers." : "No lead is shared with any buyer."}</span></div>
+  </div>
+
+  <h2>Destinations</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Status</th><th>Reason</th><th class="num">Count</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <p class="hint">A <code>blocked</code> row means the person's choices did not permit that
+    destination, so no request was even built. <code>skipped</code> means it was permitted but
+    no credential is configured. Neither is a send.</p>
+  </div>
+
+  <h2>Connectors configured</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Connector</th><th>State</th></tr></thead>
+      <tbody>${Object.entries(status.connectors).map(([k, v]) => `<tr>
+        <td><code>${esc(k)}</code></td>
+        <td>${v ? "<b>credentials present</b>" : "no credentials — will report skipped"}</td>
+      </tr>`).join("")}</tbody>
+    </table>
+  </div>
+
+  <h2>Recent submissions</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Reference</th><th>Received</th><th>Retained until</th><th>State</th></tr></thead>
+      <tbody>${subs}</tbody>
+    </table>
+    <p class="hint">No personal data is shown here on purpose. Full records are available to a
+    named operator through the API, and every access is auditable.</p>
+  </div>
+
+  <h2>Machine-readable</h2>
+  <p class="hint">The same data as JSON, for monitoring:
+  <a href="/admin/health"><code>/admin/health</code></a>,
+  <a href="/admin/verify"><code>/admin/verify</code></a>,
+  <a href="/healthz"><code>/healthz</code></a> (no token, liveness only).</p>
+</main>`,
   });
 }
